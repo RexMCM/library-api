@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.matheusMedeiros.libraryapi.api.dto.BookDTO;
 import com.matheusMedeiros.libraryapi.api.model.entity.Book;
 import com.matheusMedeiros.libraryapi.service.BookService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,9 +68,23 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Should return exception when book is empty")
-    public void createInvalidBookTest(){
+    public void createInvalidBookTest() throws Exception {
+        String json = new ObjectMapper().writeValueAsString(new BookDTO());
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .post(BOOK_API)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+        mvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("errors", Matchers.hasSize(3)));
 
     }
 
+    @Test
+    @DisplayName("Should return an error when duplicates was found")
+    public void createBookWithDuplicatedIsbn(){
+
+    }
 
 }
